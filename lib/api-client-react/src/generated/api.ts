@@ -17,9 +17,11 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  CreateLetterInput,
   CreateMemoryInput,
   GetRecentMemoriesParams,
   HealthStatus,
+  Letter,
   ListMemoriesParams,
   Memory,
   MoodCount,
@@ -1105,3 +1107,416 @@ export function useGetRecentMemories<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * Sealed letters return body=null until their unsealsAt date arrives.
+ * @summary List all letters
+ */
+export const getListLettersUrl = () => {
+  return `/api/letters`;
+};
+
+export const listLetters = async (options?: RequestInit): Promise<Letter[]> => {
+  return customFetch<Letter[]>(getListLettersUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListLettersQueryKey = () => {
+  return [`/api/letters`] as const;
+};
+
+export const getListLettersQueryOptions = <
+  TData = Awaited<ReturnType<typeof listLetters>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listLetters>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListLettersQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listLetters>>> = ({
+    signal,
+  }) => listLetters({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listLetters>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListLettersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listLetters>>
+>;
+export type ListLettersQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all letters
+ */
+
+export function useListLetters<
+  TData = Awaited<ReturnType<typeof listLetters>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listLetters>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListLettersQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Write a new sealed letter
+ */
+export const getCreateLetterUrl = () => {
+  return `/api/letters`;
+};
+
+export const createLetter = async (
+  createLetterInput: CreateLetterInput,
+  options?: RequestInit,
+): Promise<Letter> => {
+  return customFetch<Letter>(getCreateLetterUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createLetterInput),
+  });
+};
+
+export const getCreateLetterMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createLetter>>,
+    TError,
+    { data: BodyType<CreateLetterInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createLetter>>,
+  TError,
+  { data: BodyType<CreateLetterInput> },
+  TContext
+> => {
+  const mutationKey = ["createLetter"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createLetter>>,
+    { data: BodyType<CreateLetterInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createLetter(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateLetterMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createLetter>>
+>;
+export type CreateLetterMutationBody = BodyType<CreateLetterInput>;
+export type CreateLetterMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Write a new sealed letter
+ */
+export const useCreateLetter = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createLetter>>,
+    TError,
+    { data: BodyType<CreateLetterInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createLetter>>,
+  TError,
+  { data: BodyType<CreateLetterInput> },
+  TContext
+> => {
+  return useMutation(getCreateLetterMutationOptions(options));
+};
+
+/**
+ * @summary Open a single letter
+ */
+export const getGetLetterUrl = (id: string) => {
+  return `/api/letters/${id}`;
+};
+
+export const getLetter = async (
+  id: string,
+  options?: RequestInit,
+): Promise<Letter> => {
+  return customFetch<Letter>(getGetLetterUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetLetterQueryKey = (id: string) => {
+  return [`/api/letters/${id}`] as const;
+};
+
+export const getGetLetterQueryOptions = <
+  TData = Awaited<ReturnType<typeof getLetter>>,
+  TError = ErrorType<void>,
+>(
+  id: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getLetter>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetLetterQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getLetter>>> = ({
+    signal,
+  }) => getLetter(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getLetter>>, TError, TData> & {
+    queryKey: QueryKey;
+  };
+};
+
+export type GetLetterQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getLetter>>
+>;
+export type GetLetterQueryError = ErrorType<void>;
+
+/**
+ * @summary Open a single letter
+ */
+
+export function useGetLetter<
+  TData = Awaited<ReturnType<typeof getLetter>>,
+  TError = ErrorType<void>,
+>(
+  id: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getLetter>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetLetterQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Tear up a letter
+ */
+export const getDeleteLetterUrl = (id: string) => {
+  return `/api/letters/${id}`;
+};
+
+export const deleteLetter = async (
+  id: string,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteLetterUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteLetterMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteLetter>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteLetter>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ["deleteLetter"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteLetter>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteLetter(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteLetterMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteLetter>>
+>;
+
+export type DeleteLetterMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Tear up a letter
+ */
+export const useDeleteLetter = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteLetter>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteLetter>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  return useMutation(getDeleteLetterMutationOptions(options));
+};
+
+/**
+ * @summary Mark an unsealed letter as read
+ */
+export const getMarkLetterReadUrl = (id: string) => {
+  return `/api/letters/${id}/open`;
+};
+
+export const markLetterRead = async (
+  id: string,
+  options?: RequestInit,
+): Promise<Letter> => {
+  return customFetch<Letter>(getMarkLetterReadUrl(id), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getMarkLetterReadMutationOptions = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof markLetterRead>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof markLetterRead>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ["markLetterRead"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof markLetterRead>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return markLetterRead(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type MarkLetterReadMutationResult = NonNullable<
+  Awaited<ReturnType<typeof markLetterRead>>
+>;
+
+export type MarkLetterReadMutationError = ErrorType<void>;
+
+/**
+ * @summary Mark an unsealed letter as read
+ */
+export const useMarkLetterRead = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof markLetterRead>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof markLetterRead>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  return useMutation(getMarkLetterReadMutationOptions(options));
+};

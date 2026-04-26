@@ -292,3 +292,94 @@ export const GetRecentMemoriesResponseItem = zod.object({
 export const GetRecentMemoriesResponse = zod.array(
   GetRecentMemoriesResponseItem,
 );
+
+/**
+ * Sealed letters return body=null until their unsealsAt date arrives.
+ * @summary List all letters
+ */
+export const ListLettersResponseItem = zod.object({
+  id: zod.string(),
+  fromAuthor: zod.enum(["self", "partner"]).describe("Who wrote the letter."),
+  subject: zod.string().nullish(),
+  body: zod
+    .string()
+    .nullish()
+    .describe(
+      "null when the letter is still sealed (unsealsAt is in the future)",
+    ),
+  unsealsAt: zod.coerce.date(),
+  sealed: zod.boolean().describe("True when unsealsAt is in the future"),
+  read: zod.boolean(),
+  readAt: zod.coerce.date().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+export const ListLettersResponse = zod.array(ListLettersResponseItem);
+
+/**
+ * @summary Write a new sealed letter
+ */
+
+export const CreateLetterBody = zod.object({
+  fromAuthor: zod.enum(["self", "partner"]).describe("Who wrote the letter."),
+  subject: zod.string().nullish(),
+  body: zod.string().min(1),
+  unsealsAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Open a single letter
+ */
+export const GetLetterParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const GetLetterResponse = zod.object({
+  id: zod.string(),
+  fromAuthor: zod.enum(["self", "partner"]).describe("Who wrote the letter."),
+  subject: zod.string().nullish(),
+  body: zod
+    .string()
+    .nullish()
+    .describe(
+      "null when the letter is still sealed (unsealsAt is in the future)",
+    ),
+  unsealsAt: zod.coerce.date(),
+  sealed: zod.boolean().describe("True when unsealsAt is in the future"),
+  read: zod.boolean(),
+  readAt: zod.coerce.date().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Tear up a letter
+ */
+export const DeleteLetterParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+/**
+ * @summary Mark an unsealed letter as read
+ */
+export const MarkLetterReadParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const MarkLetterReadResponse = zod.object({
+  id: zod.string(),
+  fromAuthor: zod.enum(["self", "partner"]).describe("Who wrote the letter."),
+  subject: zod.string().nullish(),
+  body: zod
+    .string()
+    .nullish()
+    .describe(
+      "null when the letter is still sealed (unsealsAt is in the future)",
+    ),
+  unsealsAt: zod.coerce.date(),
+  sealed: zod.boolean().describe("True when unsealsAt is in the future"),
+  read: zod.boolean(),
+  readAt: zod.coerce.date().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});

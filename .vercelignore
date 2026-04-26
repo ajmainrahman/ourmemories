@@ -1,0 +1,10 @@
+node_modules
+artifacts/memories/dist
+artifacts/api-server/dist
+artifacts/mockup-sandbox
+**/.turbo
+**/tsconfig.tsbuildinfo
+.local
+.replit
+replit.nix
+attached_assets

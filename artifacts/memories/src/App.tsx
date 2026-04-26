@@ -11,6 +11,9 @@ import MemoryDetail from "@/pages/MemoryDetail";
 import MemoryEdit from "@/pages/MemoryEdit";
 import CalendarPage from "@/pages/CalendarPage";
 import Insights from "@/pages/Insights";
+import Letters from "@/pages/Letters";
+import LetterNew from "@/pages/LetterNew";
+import LetterDetail from "@/pages/LetterDetail";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -33,6 +36,9 @@ function Router() {
         <Route path="/journal/:id" component={MemoryDetail} />
         <Route path="/calendar" component={CalendarPage} />
         <Route path="/insights" component={Insights} />
+        <Route path="/letters" component={Letters} />
+        <Route path="/letters/new" component={LetterNew} />
+        <Route path="/letters/:id" component={LetterDetail} />
         <Route component={NotFound} />
       </Switch>
     </AnimatePresence>

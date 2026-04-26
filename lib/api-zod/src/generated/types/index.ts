@@ -7,9 +7,12 @@
  */
 
 export * from "./author";
+export * from "./createLetterInput";
 export * from "./createMemoryInput";
 export * from "./getRecentMemoriesParams";
 export * from "./healthStatus";
+export * from "./letter";
+export * from "./letterAuthor";
 export * from "./listMemoriesParams";
 export * from "./memory";
 export * from "./moodCount";

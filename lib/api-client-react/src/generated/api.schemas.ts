@@ -90,6 +90,39 @@ export interface TimelineBucket {
   count: number;
 }
 
+/**
+ * Who wrote the letter.
+ */
+export type LetterAuthor = (typeof LetterAuthor)[keyof typeof LetterAuthor];
+
+export const LetterAuthor = {
+  self: "self",
+  partner: "partner",
+} as const;
+
+export interface Letter {
+  id: string;
+  fromAuthor: LetterAuthor;
+  subject?: string | null;
+  /** null when the letter is still sealed (unsealsAt is in the future) */
+  body?: string | null;
+  unsealsAt: string;
+  /** True when unsealsAt is in the future */
+  sealed: boolean;
+  read: boolean;
+  readAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateLetterInput {
+  fromAuthor: LetterAuthor;
+  subject?: string | null;
+  /** @minLength 1 */
+  body: string;
+  unsealsAt: string;
+}
+
 export type ListMemoriesParams = {
   /**
    * Free text search over title and body

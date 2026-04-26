@@ -1,12 +1,13 @@
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { BookHeart, Home, CalendarDays, Sparkles, PenLine } from "lucide-react";
+import { BookHeart, Home, CalendarDays, Sparkles, PenLine, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/", label: "Home", icon: Home },
   { href: "/journal", label: "Journal", icon: BookHeart },
+  { href: "/letters", label: "Letters", icon: Mail },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/insights", label: "Insights", icon: Sparkles },
 ];

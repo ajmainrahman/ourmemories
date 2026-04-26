@@ -14,6 +14,8 @@ tags:
     description: Memory entries (journal entries)
   - name: stats
     description: Aggregates and dashboard data
+  - name: letters
+    description: Sealed letters between the two of you
 paths:
   /healthz:
     get:
@@ -244,6 +246,93 @@ paths:
                 items:
                   $ref: "#/components/schemas/Memory"
 
+  /letters:
+    get:
+      operationId: listLetters
+      tags: [letters]
+      summary: List all letters
+      description: Sealed letters return body=null until their unsealsAt date arrives.
+      responses:
+        "200":
+          description: Letters list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Letter"
+    post:
+      operationId: createLetter
+      tags: [letters]
+      summary: Write a new sealed letter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLetterInput"
+      responses:
+        "201":
+          description: Letter sealed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Letter"
+
+  /letters/{id}:
+    get:
+      operationId: getLetter
+      tags: [letters]
+      summary: Open a single letter
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Letter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Letter"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteLetter
+      tags: [letters]
+      summary: Tear up a letter
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Removed
+
+  /letters/{id}/open:
+    post:
+      operationId: markLetterRead
+      tags: [letters]
+      summary: Mark an unsealed letter as read
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Letter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Letter"
+        "400":
+          description: Letter is still sealed
+        "404":
+          description: Not found
+
 components:
   schemas:
     HealthStatus:
@@ -359,3 +448,35 @@ components:
         month: { type: string, description: "YYYY-MM" }
         count: { type: integer }
       required: [month, count]
+
+    LetterAuthor:
+      type: string
+      enum: [self, partner]
+      description: Who wrote the letter.
+
+    Letter:
+      type: object
+      properties:
+        id: { type: string }
+        fromAuthor: { $ref: "#/components/schemas/LetterAuthor" }
+        subject: { type: string, nullable: true }
+        body:
+          type: string
+          nullable: true
+          description: "null when the letter is still sealed (unsealsAt is in the future)"
+        unsealsAt: { type: string, format: date }
+        sealed: { type: boolean, description: "True when unsealsAt is in the future" }
+        read: { type: boolean }
+        readAt: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+      required: [id, fromAuthor, unsealsAt, sealed, read, createdAt, updatedAt]
+
+    CreateLetterInput:
+      type: object
+      properties:
+        fromAuthor: { $ref: "#/components/schemas/LetterAuthor" }
+        subject: { type: string, nullable: true }
+        body: { type: string, minLength: 1 }
+        unsealsAt: { type: string, format: date }
+      required: [fromAuthor, body, unsealsAt]
