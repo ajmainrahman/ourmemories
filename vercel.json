@@ -3,10 +3,11 @@
   "version": 2,
   "installCommand": "corepack enable && pnpm install --no-frozen-lockfile",
   "buildCommand": "pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/memories run build",
-  "outputDirectory": "artifacts/memories/dist",
+  "outputDirectory": "artifacts/memories/dist/public",
   "framework": null,
   "env": {
-    "PORT": "3000"
+    "PORT": "3000",
+    "BASE_PATH": "/"
   },
   "functions": {
     "api/index.ts": {
