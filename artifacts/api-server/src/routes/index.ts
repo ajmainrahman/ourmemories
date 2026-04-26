@@ -1,12 +1,12 @@
 import { Router, type IRouter } from "express";
-import healthRouter from "./health";
-import authRouter from "./auth";
-import memoriesRouter from "./memories";
-import statsRouter from "./stats";
-import lettersRouter from "./letters";
-import repliesRouter from "./replies";
-import bucketListRouter from "./bucketList";
-import milestonesRouter from "./milestones";
+import healthRouter from "./health.js";
+import authRouter from "./auth.js";
+import memoriesRouter from "./memories.js";
+import statsRouter from "./stats.js";
+import lettersRouter from "./letters.js";
+import repliesRouter from "./replies.js";
+import bucketListRouter from "./bucketList.js";
+import milestonesRouter from "./milestones.js";
 import { requireAuth } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
