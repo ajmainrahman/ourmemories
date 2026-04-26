@@ -5,6 +5,20 @@ await build({
   platform: "node",
   format: "esm",
   outfile: "artifacts/api-server/dist/vercel.mjs",
-  external: ["pino-pretty", "pino/file"],
+  external: [
+    "pino-pretty",
+    "pino/file",
+    "node:events",
+    "node:stream",
+    "node:buffer",
+    "node:util",
+    "node:net",
+    "node:http",
+    "node:https",
+    "node:crypto",
+    "node:path",
+    "node:fs",
+    "node:os"
+  ],
 });
 console.log("✅ Vercel entry built");
