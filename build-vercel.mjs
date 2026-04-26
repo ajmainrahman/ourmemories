@@ -1,19 +1,18 @@
 import { createRequire } from "node:module";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { build as esbuild } from "./artifacts/api-server/node_modules/esbuild/lib/main.js";
-import esbuildPluginPino from "./artifacts/api-server/node_modules/esbuild-plugin-pino/index.js";
-
 globalThis.require = createRequire(import.meta.url);
-const artifactDir = path.resolve("artifacts/api-server");
 
-await esbuild({
-  entryPoints: [path.resolve(artifactDir, "src/vercel.ts")],
+const { build } = await import("./artifacts/api-server/node_modules/esbuild/lib/main.js");
+const pinoPath = "./node_modules/.pnpm/esbuild-plugin-pino@2.3.3_esbuild@0.27.3_pino-pretty@13.1.3_pino@9.14.0_thread-stream@3.1.0/node_modules/esbuild-plugin-pino/dist/index.js";
+const { default: esbuildPluginPino } = await import(pinoPath);
+
+await build({
+  entryPoints: ["artifacts/api-server/src/vercel.ts"],
   platform: "node",
   bundle: true,
   format: "esm",
-  outfile: path.resolve(artifactDir, "dist/vercel.mjs"),
-  external: ["*.node", "sharp", "pg-native"],
+  outdir: "artifacts/api-server/dist/vercel",
+  outExtension: { ".js": ".mjs" },
+  external: ["*.node", "pg-native"],
   sourcemap: false,
   plugins: [esbuildPluginPino({ transports: ["pino-pretty"] })],
   banner: {
@@ -22,8 +21,7 @@ import __bannerPath from 'node:path';
 import __bannerUrl from 'node:url';
 globalThis.require = __bannerCrReq(import.meta.url);
 globalThis.__filename = __bannerUrl.fileURLToPath(import.meta.url);
-globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
-`,
+globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);`,
   },
 });
-console.log("✅ Vercel entry built");
+console.log("✅ Done");
