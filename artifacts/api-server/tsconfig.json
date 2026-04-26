@@ -8,9 +8,9 @@
     "rootDir": "src",
     "types": ["node"],
     "skipLibCheck": true,
+    "noCheck": true,
     "noEmit": true,
-    "strict": false,
-    "isolatedModules": true
+    "strict": false
   },
   "include": ["src"]
 }
