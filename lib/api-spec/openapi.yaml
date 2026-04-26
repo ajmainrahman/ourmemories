@@ -3,20 +3,23 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: API specification for the Our Memories journal app
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: memories
+    description: Memory entries (journal entries)
+  - name: stats
+    description: Aggregates and dashboard data
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +27,223 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /memories:
+    get:
+      operationId: listMemories
+      tags: [memories]
+      summary: List memories
+      description: Returns all memories, newest first. Optional filters by mood, tag, year, and full-text search.
+      parameters:
+        - in: query
+          name: search
+          schema: { type: string }
+          description: Free text search over title and body
+        - in: query
+          name: mood
+          schema: { type: string }
+        - in: query
+          name: tag
+          schema: { type: string }
+        - in: query
+          name: year
+          schema: { type: integer }
+        - in: query
+          name: favorite
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: A list of memories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Memory"
+    post:
+      operationId: createMemory
+      tags: [memories]
+      summary: Create a memory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMemoryInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Memory"
+
+  /memories/{id}:
+    get:
+      operationId: getMemory
+      tags: [memories]
+      summary: Get a single memory by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: A memory
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Memory"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateMemory
+      tags: [memories]
+      summary: Update a memory
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMemoryInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Memory"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteMemory
+      tags: [memories]
+      summary: Delete a memory
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Deleted
+
+  /memories/{id}/favorite:
+    post:
+      operationId: toggleFavorite
+      tags: [memories]
+      summary: Toggle favorite on a memory
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Memory"
+
+  /stats/overview:
+    get:
+      operationId: getStatsOverview
+      tags: [stats]
+      summary: Headline stats for the dashboard
+      responses:
+        "200":
+          description: Stats overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatsOverview"
+
+  /stats/mood-breakdown:
+    get:
+      operationId: getMoodBreakdown
+      tags: [stats]
+      summary: Count of memories grouped by mood
+      responses:
+        "200":
+          description: Mood breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MoodCount"
+
+  /stats/tags:
+    get:
+      operationId: getTagCloud
+      tags: [stats]
+      summary: All tags across memories with counts
+      responses:
+        "200":
+          description: Tag cloud
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TagCount"
+
+  /stats/timeline:
+    get:
+      operationId: getTimeline
+      tags: [stats]
+      summary: Memory counts grouped by month for the timeline view
+      responses:
+        "200":
+          description: Timeline buckets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimelineBucket"
+
+  /memories/on-this-day:
+    get:
+      operationId: getOnThisDay
+      tags: [memories]
+      summary: Memories from today's date in past years
+      responses:
+        "200":
+          description: On this day memories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Memory"
+
+  /memories/recent:
+    get:
+      operationId: getRecentMemories
+      tags: [memories]
+      summary: A handful of the most recent memories for the dashboard
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, default: 5 }
+      responses:
+        "200":
+          description: Recent memories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Memory"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +251,111 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    Author:
+      type: string
+      enum: [self, partner, both]
+      description: Who wrote this memory — used for the his/hers/ours filter.
+
+    Memory:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        body: { type: string }
+        memoryDate:
+          type: string
+          format: date
+          description: The date the memory happened (not when it was written)
+        location: { type: string, nullable: true }
+        mood: { type: string, nullable: true, description: "e.g. joyful, peaceful, silly, romantic, adventurous, nostalgic, grateful, bittersweet" }
+        author: { $ref: "#/components/schemas/Author" }
+        tags:
+          type: array
+          items: { type: string }
+        photos:
+          type: array
+          items: { type: string, description: "URL to a photo" }
+        favorite: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+      required:
+        - id
+        - title
+        - body
+        - memoryDate
+        - author
+        - tags
+        - photos
+        - favorite
+        - createdAt
+        - updatedAt
+
+    CreateMemoryInput:
+      type: object
+      properties:
+        title: { type: string, minLength: 1 }
+        body: { type: string }
+        memoryDate: { type: string, format: date }
+        location: { type: string, nullable: true }
+        mood: { type: string, nullable: true }
+        author: { $ref: "#/components/schemas/Author" }
+        tags:
+          type: array
+          items: { type: string }
+        photos:
+          type: array
+          items: { type: string }
+      required: [title, body, memoryDate, author]
+
+    UpdateMemoryInput:
+      type: object
+      properties:
+        title: { type: string }
+        body: { type: string }
+        memoryDate: { type: string, format: date }
+        location: { type: string, nullable: true }
+        mood: { type: string, nullable: true }
+        author: { $ref: "#/components/schemas/Author" }
+        tags:
+          type: array
+          items: { type: string }
+        photos:
+          type: array
+          items: { type: string }
+        favorite: { type: boolean }
+
+    StatsOverview:
+      type: object
+      properties:
+        totalMemories: { type: integer }
+        favoriteCount: { type: integer }
+        photoCount: { type: integer }
+        firstMemoryDate: { type: string, format: date, nullable: true }
+        latestMemoryDate: { type: string, format: date, nullable: true }
+        daysTogether: { type: integer, description: "Days between first and latest memory" }
+        streakDays: { type: integer, description: "Consecutive days with at least one memory ending today" }
+        topMood: { type: string, nullable: true }
+      required: [totalMemories, favoriteCount, photoCount, daysTogether, streakDays]
+
+    MoodCount:
+      type: object
+      properties:
+        mood: { type: string }
+        count: { type: integer }
+      required: [mood, count]
+
+    TagCount:
+      type: object
+      properties:
+        tag: { type: string }
+        count: { type: integer }
+      required: [tag, count]
+
+    TimelineBucket:
+      type: object
+      properties:
+        month: { type: string, description: "YYYY-MM" }
+        count: { type: integer }
+      required: [month, count]

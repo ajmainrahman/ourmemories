@@ -1,27 +1,49 @@
-# Workspace
+# Our Memories
 
-## Overview
+A private, beautifully kept interactive web journal for two people to capture
+and revisit their shared memories. Warm, intimate, paper-like aesthetic — not
+an admin dashboard.
 
-pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
+## Architecture
 
-## Stack
+This is a pnpm monorepo with three artifacts:
 
-- **Monorepo tool**: pnpm workspaces
-- **Node.js version**: 24
-- **Package manager**: pnpm
-- **TypeScript version**: 5.9
-- **API framework**: Express 5
-- **Database**: PostgreSQL + Drizzle ORM
-- **Validation**: Zod (`zod/v4`), `drizzle-zod`
-- **API codegen**: Orval (from OpenAPI spec)
-- **Build**: esbuild (CJS bundle)
+- **`artifacts/memories`** (`@workspace/memories`) — React + Vite frontend.
+  Slug `memories`, served at `/`.
+- **`artifacts/api-server`** (`@workspace/api-server`) — Fastify API at `/api/*`.
+- **`artifacts/mockup-sandbox`** (`@workspace/mockup-sandbox`) — design
+  scaffolding (unused for shipped UI).
 
-## Key Commands
+Shared libs:
 
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- `pnpm --filter @workspace/api-server run dev` — run API server locally
+- **`lib/api-spec`** — OpenAPI spec (single source of truth).
+- **`lib/api-client-react`** — orval-generated React Query hooks.
+- **`lib/db`** — Drizzle ORM + schema. Database is Replit Postgres.
 
-See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+## Domain
+
+A memory has: `title`, `body`, `memoryDate` (YYYY-MM-DD), optional `location`,
+optional `mood` (joyful, peaceful, silly, romantic, adventurous, nostalgic,
+grateful, bittersweet), `author` (`self` | `partner` | `both`), `tags[]`,
+`photos[]` (URLs), `favorite` flag.
+
+## Frontend
+
+- React 19, Vite 7, Wouter for routing, TanStack Query, Framer Motion,
+  Recharts, react-day-picker, Tailwind v4, shadcn/ui.
+- Fonts: Fraunces (serif), Plus Jakarta Sans (UI), Caveat (script accents).
+- Palette: cream paper background, terracotta-rose primary, sage accent.
+- Pages: Home (dashboard), Journal (filterable grid + timeline), MemoryNew,
+  MemoryDetail, MemoryEdit, CalendarPage, Insights (charts + tag cloud).
+
+## API
+
+- `GET/POST /api/memories`, `GET/PUT/DELETE /api/memories/:id`,
+  `POST /api/memories/:id/favorite` (toggle).
+- `GET /api/memories/recent`, `GET /api/memories/on-this-day`.
+- `GET /api/stats/overview`, `/api/stats/mood-breakdown`,
+  `/api/stats/tags`, `/api/stats/timeline`.
+
+## Scripts
+
+- `pnpm --filter @workspace/scripts run seed-memories` — seed 10 sample memories.
