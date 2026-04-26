@@ -130,7 +130,7 @@ router.get("/memories/:id", async (req, res) => {
 router.patch("/memories/:id", async (req, res) => {
   const body = UpdateMemoryBody.parse(req.body);
   const updates: Partial<typeof memoriesTable.$inferInsert> = {
-    updatedAt: new Date(),
+    updatedAt: new Date().toISOString(),
   };
   if (body.title !== undefined) updates.title = body.title;
   if (body.body !== undefined) updates.body = body.body;
@@ -170,7 +170,7 @@ router.post("/memories/:id/favorite", async (req, res) => {
   }
   const [row] = await db
     .update(memoriesTable)
-    .set({ favorite: !existing.favorite, updatedAt: new Date() })
+    .set({ favorite: !existing.favorite, updatedAt: new Date().toISOString() })
     .where(eq(memoriesTable.id, req.params.id))
     .returning();
   res.json(serialize(row));
