@@ -9,7 +9,7 @@ This is a pnpm workspace monorepo using TypeScript. Each package manages its own
 ## Artifacts
 
 - `artifacts/memories` — the journal frontend (React + Vite + wouter, TanStack Query, Tailwind v4, shadcn/ui). Served at `/`.
-- `artifacts/api-server` — Express API server. Served at `/api`. Routes: memories, letters, stats, health.
+- `artifacts/api-server` — Express API server. Served at `/api`. Routes: auth, memories, letters, stats, replies, bucket-list, milestones, health.
 - `artifacts/mockup-sandbox` — design sandbox.
 
 ## Pages
@@ -17,7 +17,16 @@ This is a pnpm workspace monorepo using TypeScript. Each package manages its own
 - `/` Home (today summary, stats, recent + on-this-day, mood breakdown)
 - `/journal` browse memories, `/journal/new`, `/journal/:id`, `/journal/:id/edit`
 - `/letters` sealed letters, `/letters/new`, `/letters/:id`
+- `/bucket-list` shared bucket list / wishlist
+- `/milestones` anniversaries with days-since and countdown counters
 - `/calendar` calendar view, `/insights` aggregate charts
+
+## Auth
+
+- Email + password sign-in shared between two users (everyone signed in sees the same journal).
+- JWT in httpOnly cookie (`om_session`), 7-day expiry. Signed with `SESSION_SECRET` env var.
+- All API routes except `/api/healthz` and `/api/auth/*` require authentication.
+- Replies on memories are signed by the logged-in user; bucket list items track who added them.
 
 ## Stack
 

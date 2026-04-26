@@ -7,16 +7,27 @@
  */
 
 export * from "./author";
+export * from "./bucketListItem";
+export * from "./createBucketListInput";
 export * from "./createLetterInput";
 export * from "./createMemoryInput";
+export * from "./createMilestoneInput";
+export * from "./createReplyInput";
 export * from "./getRecentMemoriesParams";
 export * from "./healthStatus";
 export * from "./letter";
 export * from "./letterAuthor";
 export * from "./listMemoriesParams";
+export * from "./loginInput";
 export * from "./memory";
+export * from "./milestone";
 export * from "./moodCount";
+export * from "./registerInput";
+export * from "./reply";
 export * from "./statsOverview";
 export * from "./tagCount";
 export * from "./timelineBucket";
+export * from "./updateBucketListInput";
 export * from "./updateMemoryInput";
+export * from "./updateMilestoneInput";
+export * from "./user";

@@ -1,16 +1,44 @@
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { BookHeart, Home, CalendarDays, Sparkles, PenLine, Mail } from "lucide-react";
+import {
+  BookHeart,
+  Home,
+  CalendarDays,
+  Sparkles,
+  PenLine,
+  Mail,
+  ListChecks,
+  CalendarHeart,
+  LogOut,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const NAV = [
   { href: "/", label: "Home", icon: Home },
   { href: "/journal", label: "Journal", icon: BookHeart },
   { href: "/letters", label: "Letters", icon: Mail },
+  { href: "/bucket-list", label: "Bucket list", icon: ListChecks },
+  { href: "/milestones", label: "Milestones", icon: CalendarHeart },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/insights", label: "Insights", icon: Sparkles },
 ];
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 function withBase(path: string) {
   const base = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -19,6 +47,7 @@ function withBase(path: string) {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
+  const { user, logout } = useAuth();
 
   return (
     <div className="min-h-screen w-full">
@@ -72,13 +101,44 @@ export function Layout({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <Link href="/journal/new">
-            <Button size="sm" className="rounded-full gap-1.5 shadow-sm">
-              <PenLine className="w-4 h-4" />
-              <span className="hidden sm:inline">Write a memory</span>
-              <span className="sm:hidden">Write</span>
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/journal/new">
+              <Button size="sm" className="rounded-full gap-1.5 shadow-sm">
+                <PenLine className="w-4 h-4" />
+                <span className="hidden sm:inline">Write a memory</span>
+                <span className="sm:hidden">Write</span>
+              </Button>
+            </Link>
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="w-9 h-9 rounded-full bg-secondary text-secondary-foreground text-xs font-semibold flex items-center justify-center hover:bg-secondary/80 transition-colors"
+                    aria-label="Account menu"
+                    data-testid="user-menu-trigger"
+                  >
+                    {initials(user.name)}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="font-serif text-sm">{user.name}</div>
+                    <div className="text-xs text-muted-foreground font-normal">
+                      {user.email}
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => logout()}
+                    className="text-destructive focus:text-destructive gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
 
         {/* Mobile nav */}

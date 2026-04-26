@@ -123,6 +123,95 @@ export interface CreateLetterInput {
   unsealsAt: string;
 }
 
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+}
+
+export interface RegisterInput {
+  email: string;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 6 */
+  password: string;
+}
+
+export interface LoginInput {
+  email: string;
+  /** @minLength 1 */
+  password: string;
+}
+
+export interface Reply {
+  id: string;
+  memoryId: string;
+  authorId: string;
+  authorName: string;
+  body: string;
+  createdAt: string;
+}
+
+export interface CreateReplyInput {
+  /** @minLength 1 */
+  body: string;
+}
+
+export interface BucketListItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  /** e.g. place, restaurant, activity, experience */
+  category?: string | null;
+  completed: boolean;
+  completedAt?: string | null;
+  addedById?: string | null;
+  addedByName?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBucketListInput {
+  /** @minLength 1 */
+  title: string;
+  description?: string | null;
+  category?: string | null;
+}
+
+export interface UpdateBucketListInput {
+  title?: string;
+  description?: string | null;
+  category?: string | null;
+  completed?: boolean;
+}
+
+export interface Milestone {
+  id: string;
+  title: string;
+  date: string;
+  description?: string | null;
+  /** Emoji or short label */
+  icon?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMilestoneInput {
+  /** @minLength 1 */
+  title: string;
+  date: string;
+  description?: string | null;
+  icon?: string | null;
+}
+
+export interface UpdateMilestoneInput {
+  title?: string;
+  date?: string;
+  description?: string | null;
+  icon?: string | null;
+}
+
 export type ListMemoriesParams = {
   /**
    * Free text search over title and body

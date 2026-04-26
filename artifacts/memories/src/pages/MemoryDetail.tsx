@@ -18,6 +18,7 @@ import {
 } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { RepliesSection } from "@/components/RepliesSection";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -233,6 +234,8 @@ export default function MemoryDetail() {
       <p className="text-xs text-muted-foreground mt-6 text-center font-script text-base">
         Written on {format(parseISO(memory.createdAt), "MMM d, yyyy")}
       </p>
+
+      <RepliesSection memoryId={memory.id} />
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>

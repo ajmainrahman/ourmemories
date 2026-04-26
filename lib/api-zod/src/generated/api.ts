@@ -383,3 +383,199 @@ export const MarkLetterReadResponse = zod.object({
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
 });
+
+/**
+ * @summary Create an account
+ */
+
+export const registerBodyPasswordMin = 6;
+
+export const RegisterBody = zod.object({
+  email: zod.string().email(),
+  name: zod.string().min(1),
+  password: zod.string().min(registerBodyPasswordMin),
+});
+
+/**
+ * @summary Sign in
+ */
+
+export const LoginBody = zod.object({
+  email: zod.string().email(),
+  password: zod.string().min(1),
+});
+
+export const LoginResponse = zod.object({
+  id: zod.string(),
+  email: zod.string().email(),
+  name: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Get the currently signed-in user
+ */
+export const GetCurrentUserResponse = zod.object({
+  id: zod.string(),
+  email: zod.string().email(),
+  name: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+
+/**
+ * @summary List replies on a memory
+ */
+export const ListRepliesParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const ListRepliesResponseItem = zod.object({
+  id: zod.string(),
+  memoryId: zod.string(),
+  authorId: zod.string(),
+  authorName: zod.string(),
+  body: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+export const ListRepliesResponse = zod.array(ListRepliesResponseItem);
+
+/**
+ * @summary Add a reply to a memory
+ */
+export const CreateReplyParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const CreateReplyBody = zod.object({
+  body: zod.string().min(1),
+});
+
+/**
+ * @summary Delete a reply
+ */
+export const DeleteReplyParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+/**
+ * @summary List bucket list items
+ */
+export const ListBucketListResponseItem = zod.object({
+  id: zod.string(),
+  title: zod.string(),
+  description: zod.string().nullish(),
+  category: zod
+    .string()
+    .nullish()
+    .describe("e.g. place, restaurant, activity, experience"),
+  completed: zod.boolean(),
+  completedAt: zod.coerce.date().nullish(),
+  addedById: zod.string().nullish(),
+  addedByName: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+export const ListBucketListResponse = zod.array(ListBucketListResponseItem);
+
+/**
+ * @summary Add an item to the bucket list
+ */
+
+export const CreateBucketListItemBody = zod.object({
+  title: zod.string().min(1),
+  description: zod.string().nullish(),
+  category: zod.string().nullish(),
+});
+
+/**
+ * @summary Update or check off a bucket list item
+ */
+export const UpdateBucketListItemParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const UpdateBucketListItemBody = zod.object({
+  title: zod.string().optional(),
+  description: zod.string().nullish(),
+  category: zod.string().nullish(),
+  completed: zod.boolean().optional(),
+});
+
+export const UpdateBucketListItemResponse = zod.object({
+  id: zod.string(),
+  title: zod.string(),
+  description: zod.string().nullish(),
+  category: zod
+    .string()
+    .nullish()
+    .describe("e.g. place, restaurant, activity, experience"),
+  completed: zod.boolean(),
+  completedAt: zod.coerce.date().nullish(),
+  addedById: zod.string().nullish(),
+  addedByName: zod.string().nullish(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Remove a bucket list item
+ */
+export const DeleteBucketListItemParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+/**
+ * @summary List milestones
+ */
+export const ListMilestonesResponseItem = zod.object({
+  id: zod.string(),
+  title: zod.string(),
+  date: zod.coerce.date(),
+  description: zod.string().nullish(),
+  icon: zod.string().nullish().describe("Emoji or short label"),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+export const ListMilestonesResponse = zod.array(ListMilestonesResponseItem);
+
+/**
+ * @summary Add a milestone
+ */
+
+export const CreateMilestoneBody = zod.object({
+  title: zod.string().min(1),
+  date: zod.coerce.date(),
+  description: zod.string().nullish(),
+  icon: zod.string().nullish(),
+});
+
+/**
+ * @summary Update a milestone
+ */
+export const UpdateMilestoneParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const UpdateMilestoneBody = zod.object({
+  title: zod.string().optional(),
+  date: zod.coerce.date().optional(),
+  description: zod.string().nullish(),
+  icon: zod.string().nullish(),
+});
+
+export const UpdateMilestoneResponse = zod.object({
+  id: zod.string(),
+  title: zod.string(),
+  date: zod.coerce.date(),
+  description: zod.string().nullish(),
+  icon: zod.string().nullish().describe("Emoji or short label"),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Remove a milestone
+ */
+export const DeleteMilestoneParams = zod.object({
+  id: zod.coerce.string(),
+});
