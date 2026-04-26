@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "installCommand": "corepack enable && pnpm install --no-frozen-lockfile",
-  "buildCommand": "pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/memories run build && node -e \"require('esbuild').buildSync({entryPoints:['artifacts/api-server/src/vercel.ts'],bundle:true,platform:'node',format:'esm',outfile:'artifacts/api-server/dist/vercel.mjs',packages:'external'})\"",
+  "buildCommand": "pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/memories run build && node build-vercel.mjs",
   "outputDirectory": "artifacts/memories/dist/public",
   "framework": null,
   "env": {
