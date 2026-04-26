@@ -12,5 +12,8 @@
     {
       "path": "./lib/api-zod"
     }
+  ],
+  "exclude": [
+    "artifacts/api-server"
   ]
 }
