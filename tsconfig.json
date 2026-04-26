@@ -1,12 +1,8 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compileOnSave": false,
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noEmit": true
+  },
   "files": [],
-  "references": [],
-  "exclude": [
-    "artifacts/api-server",
-    "artifacts/api-server",
-    "artifacts/memories",
-    "lib"
-  ]
+  "exclude": ["**/*"]
 }
