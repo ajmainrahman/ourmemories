@@ -22,10 +22,14 @@ Shared libs:
 
 ## Domain
 
-A memory has: `title`, `body`, `memoryDate` (YYYY-MM-DD), optional `location`,
+**Memory** — `title`, `body`, `memoryDate` (YYYY-MM-DD), optional `location`,
 optional `mood` (joyful, peaceful, silly, romantic, adventurous, nostalgic,
 grateful, bittersweet), `author` (`self` | `partner` | `both`), `tags[]`,
 `photos[]` (URLs), `favorite` flag.
+
+**Letter** — sealed note for the future. `fromAuthor` (`self` | `partner`),
+optional `subject`, `body`, `unsealsAt` (date). The API returns `body: null`
+and `sealed: true` until `unsealsAt <= today`. Marked `read` on first open.
 
 ## Frontend
 
@@ -34,7 +38,8 @@ grateful, bittersweet), `author` (`self` | `partner` | `both`), `tags[]`,
 - Fonts: Fraunces (serif), Plus Jakarta Sans (UI), Caveat (script accents).
 - Palette: cream paper background, terracotta-rose primary, sage accent.
 - Pages: Home (dashboard), Journal (filterable grid + timeline), MemoryNew,
-  MemoryDetail, MemoryEdit, CalendarPage, Insights (charts + tag cloud).
+  MemoryDetail, MemoryEdit, CalendarPage, Insights (charts + tag cloud),
+  Letters (sealed/open lists), LetterNew, LetterDetail.
 
 ## API
 
@@ -43,6 +48,14 @@ grateful, bittersweet), `author` (`self` | `partner` | `both`), `tags[]`,
 - `GET /api/memories/recent`, `GET /api/memories/on-this-day`.
 - `GET /api/stats/overview`, `/api/stats/mood-breakdown`,
   `/api/stats/tags`, `/api/stats/timeline`.
+- `GET/POST /api/letters`, `GET/DELETE /api/letters/:id`,
+  `POST /api/letters/:id/open` (mark read after unsealing).
+
+## Deployment
+
+- **Replit:** the existing workflows already serve the app.
+- **Vercel:** `vercel.json` + `api/index.ts` adapt the Express app as a
+  serverless function. See `DEPLOY_VERCEL.md` for the full guide.
 
 ## Scripts
 
