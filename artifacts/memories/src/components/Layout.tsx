@@ -123,7 +123,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <footer className="border-t border-border/50 mt-16">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8 text-center">
           <p className="font-script text-lg text-muted-foreground">
-            Kept by the two of you, for the two of you.
+            Kept by the two of us, for the two of us.
           </p>
         </div>
       </footer>

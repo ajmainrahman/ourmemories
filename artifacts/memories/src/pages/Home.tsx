@@ -52,7 +52,7 @@ export default function Home() {
           <span className="italic text-primary">my love.</span>
         </h1>
         <p className="text-foreground/65 max-w-xl mx-auto leading-relaxed">
-          A quiet little place for the two of you — the small moments, the big ones,
+          A quiet little place for the two of us — the small moments, the big ones,
           and everything sweet in between.
         </p>
         <div className="flex items-center justify-center gap-3 mt-7">

@@ -88,7 +88,7 @@ router.post("/letters/:id/open", async (req, res) => {
   }
   const [row] = await db
     .update(lettersTable)
-    .set({ read: true, readAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
+    .set({ read: true, readAt: new Date(), updatedAt: new Date() })
     .where(eq(lettersTable.id, req.params.id))
     .returning();
   res.json(serialize(row));
