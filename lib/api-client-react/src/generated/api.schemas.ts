@@ -162,8 +162,10 @@ export interface BucketListItem {
   id: string;
   title: string;
   description?: string | null;
-  /** e.g. place, restaurant, activity, experience */
+  /** Free-form category label (predefined or custom) */
   category?: string | null;
+  /** Optional target date */
+  deadline?: string | null;
   completed: boolean;
   completedAt?: string | null;
   addedById?: string | null;
@@ -177,12 +179,14 @@ export interface CreateBucketListInput {
   title: string;
   description?: string | null;
   category?: string | null;
+  deadline?: string | null;
 }
 
 export interface UpdateBucketListInput {
   title?: string;
   description?: string | null;
   category?: string | null;
+  deadline?: string | null;
   completed?: boolean;
 }
 

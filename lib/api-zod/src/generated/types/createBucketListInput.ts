@@ -11,4 +11,5 @@ export interface CreateBucketListInput {
   title: string;
   description?: string | null;
   category?: string | null;
+  deadline?: Date | null;
 }

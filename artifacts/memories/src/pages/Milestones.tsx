@@ -1,10 +1,11 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { format, parseISO, differenceInDays, addYears } from "date-fns";
 import {
   useListMilestones,
   useCreateMilestone,
+  useUpdateMilestone,
   useDeleteMilestone,
   getListMilestonesQueryKey,
 } from "@workspace/api-client-react";
@@ -12,10 +13,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Heart, CalendarHeart } from "lucide-react";
+import { Plus, Trash2, Heart, CalendarHeart, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const SUGGESTED_ICONS = ["💞", "💍", "💋", "🌹", "✈️", "🏠", "🎂", "🥂", "🌟", "🎁"];
+
+type MilestoneRow = {
+  id: string;
+  title: string;
+  date: string;
+  description: string | null;
+  icon: string | null;
+};
+
+type FormValues = {
+  title: string;
+  date: string;
+  icon: string;
+  description: string;
+};
+
+const EMPTY_FORM: FormValues = {
+  title: "",
+  date: "",
+  icon: "💞",
+  description: "",
+};
 
 export default function Milestones() {
   const queryClient = useQueryClient();
@@ -25,10 +48,7 @@ export default function Milestones() {
   });
 
   const [showAdd, setShowAdd] = useState(false);
-  const [title, setTitle] = useState("");
-  const [date, setDate] = useState("");
-  const [icon, setIcon] = useState("💞");
-  const [description, setDescription] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   function invalidate() {
     queryClient.invalidateQueries({ queryKey: getListMilestonesQueryKey() });
@@ -38,12 +58,18 @@ export default function Milestones() {
     mutation: {
       onSuccess: () => {
         invalidate();
-        setTitle("");
-        setDate("");
-        setIcon("💞");
-        setDescription("");
         setShowAdd(false);
         toast({ title: "Milestone added." });
+      },
+    },
+  });
+
+  const update = useUpdateMilestone({
+    mutation: {
+      onSuccess: () => {
+        invalidate();
+        setEditingId(null);
+        toast({ title: "Milestone updated." });
       },
     },
   });
@@ -57,15 +83,25 @@ export default function Milestones() {
     },
   });
 
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!title.trim() || !date) return;
+  function handleCreate(values: FormValues) {
     create.mutate({
       data: {
-        title: title.trim(),
-        date,
-        icon: icon || null,
-        description: description.trim() || null,
+        title: values.title.trim(),
+        date: values.date,
+        icon: values.icon || null,
+        description: values.description.trim() || null,
+      },
+    });
+  }
+
+  function handleUpdate(id: string, values: FormValues) {
+    update.mutate({
+      id,
+      data: {
+        title: values.title.trim(),
+        date: values.date,
+        icon: values.icon || null,
+        description: values.description.trim() || null,
       },
     });
   }
@@ -77,14 +113,12 @@ export default function Milestones() {
       const d = parseISO(m.date);
       const daysSince = differenceInDays(today, d);
 
-      // Find next anniversary occurrence
       let nextAnniv = new Date(d);
       while (nextAnniv < today) {
         nextAnniv = addYears(nextAnniv, 1);
       }
       const daysUntilAnniv = differenceInDays(nextAnniv, today);
-      const upcomingYears =
-        nextAnniv.getFullYear() - d.getFullYear();
+      const upcomingYears = nextAnniv.getFullYear() - d.getFullYear();
 
       return { ...m, daysSince, daysUntilAnniv, upcomingYears, dateObj: d };
     });
@@ -114,76 +148,20 @@ export default function Milestones() {
 
       <AnimatePresence>
         {showAdd && (
-          <motion.form
+          <motion.div
             initial={{ opacity: 0, y: -8, height: 0 }}
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -8, height: 0 }}
-            onSubmit={onSubmit}
             className="overflow-hidden mb-6"
           >
-            <div className="rounded-2xl border border-card-border bg-card p-5 space-y-4">
-              <div className="grid sm:grid-cols-[1fr_180px] gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="First date"
-                    required
-                    autoFocus
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="date">Date</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label>Icon</Label>
-                <div className="flex flex-wrap gap-1.5">
-                  {SUGGESTED_ICONS.map((emoji) => (
-                    <button
-                      key={emoji}
-                      type="button"
-                      onClick={() => setIcon(emoji)}
-                      className={`w-10 h-10 text-lg rounded-full border transition-colors ${
-                        icon === emoji
-                          ? "border-primary bg-primary/10"
-                          : "border-card-border hover:bg-secondary"
-                      }`}
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="desc">Description (optional)</Label>
-                <Textarea
-                  id="desc"
-                  rows={2}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="A note about why this day matters..."
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="ghost" onClick={() => setShowAdd(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={create.isPending}>
-                  {create.isPending ? "Saving..." : "Add milestone"}
-                </Button>
-              </div>
-            </div>
-          </motion.form>
+            <MilestoneForm
+              mode="create"
+              initial={EMPTY_FORM}
+              submitting={create.isPending}
+              onSubmit={handleCreate}
+              onCancel={() => setShowAdd(false)}
+            />
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -199,21 +177,136 @@ export default function Milestones() {
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 gap-4">
-          {sorted.map((m) => (
-            <MilestoneCard key={m.id} m={m} onDelete={() => del.mutate({ id: m.id })} />
-          ))}
+          {sorted.map((m) =>
+            editingId === m.id ? (
+              <div key={m.id} className="sm:col-span-2">
+                <MilestoneForm
+                  mode="edit"
+                  initial={{
+                    title: m.title,
+                    date: m.date,
+                    icon: m.icon ?? "💞",
+                    description: m.description ?? "",
+                  }}
+                  submitting={update.isPending}
+                  onSubmit={(v) => handleUpdate(m.id, v)}
+                  onCancel={() => setEditingId(null)}
+                />
+              </div>
+            ) : (
+              <MilestoneCard
+                key={m.id}
+                m={m}
+                onEdit={() => setEditingId(m.id)}
+                onDelete={() => del.mutate({ id: m.id })}
+              />
+            ),
+          )}
         </div>
       )}
     </div>
   );
 }
 
-type EnrichedMilestone = {
-  id: string;
-  title: string;
-  date: string;
-  description: string | null;
-  icon: string | null;
+function MilestoneForm({
+  mode,
+  initial,
+  submitting,
+  onSubmit,
+  onCancel,
+}: {
+  mode: "create" | "edit";
+  initial: FormValues;
+  submitting: boolean;
+  onSubmit: (values: FormValues) => void;
+  onCancel: () => void;
+}) {
+  const [title, setTitle] = useState(initial.title);
+  const [date, setDate] = useState(initial.date);
+  const [icon, setIcon] = useState(initial.icon);
+  const [description, setDescription] = useState(initial.description);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!title.trim() || !date) return;
+    onSubmit({ title, date, icon, description });
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="rounded-2xl border border-card-border bg-card p-5 space-y-4">
+        <div className="grid sm:grid-cols-[1fr_180px] gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="First date"
+              required
+              autoFocus
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="date">Date</Label>
+            <Input
+              id="date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Icon</Label>
+          <div className="flex flex-wrap gap-1.5">
+            {SUGGESTED_ICONS.map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => setIcon(emoji)}
+                className={`w-10 h-10 text-lg rounded-full border transition-colors ${
+                  icon === emoji
+                    ? "border-primary bg-primary/10"
+                    : "border-card-border hover:bg-secondary"
+                }`}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="desc">Description (optional)</Label>
+          <Textarea
+            id="desc"
+            rows={2}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="A note about why this day matters..."
+          />
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={submitting}>
+            {submitting
+              ? mode === "create"
+                ? "Saving..."
+                : "Saving..."
+              : mode === "create"
+                ? "Add milestone"
+                : "Save changes"}
+          </Button>
+        </div>
+      </div>
+    </form>
+  );
+}
+
+type EnrichedMilestone = MilestoneRow & {
   daysSince: number;
   daysUntilAnniv: number;
   upcomingYears: number;
@@ -222,9 +315,11 @@ type EnrichedMilestone = {
 
 function MilestoneCard({
   m,
+  onEdit,
   onDelete,
 }: {
   m: EnrichedMilestone;
+  onEdit: () => void;
   onDelete: () => void;
 }) {
   const isToday = m.daysUntilAnniv === 0;
@@ -239,14 +334,24 @@ function MilestoneCard({
           : "border-card-border bg-card"
       }`}
     >
-      <button
-        type="button"
-        onClick={onDelete}
-        className="absolute top-3 right-3 p-1.5 rounded-full text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-        aria-label="Delete"
-      >
-        <Trash2 className="w-3.5 h-3.5" />
-      </button>
+      <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          type="button"
+          onClick={onEdit}
+          className="p-1.5 rounded-full text-muted-foreground hover:text-foreground"
+          aria-label="Edit"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+        </button>
+        <button
+          type="button"
+          onClick={onDelete}
+          className="p-1.5 rounded-full text-muted-foreground hover:text-destructive"
+          aria-label="Delete"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
 
       <div className="flex items-start gap-3">
         <div className="text-3xl leading-none">{m.icon ?? "💞"}</div>

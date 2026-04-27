@@ -467,7 +467,8 @@ export const ListBucketListResponseItem = zod.object({
   category: zod
     .string()
     .nullish()
-    .describe("e.g. place, restaurant, activity, experience"),
+    .describe("Free-form category label (predefined or custom)"),
+  deadline: zod.coerce.date().nullish().describe("Optional target date"),
   completed: zod.boolean(),
   completedAt: zod.coerce.date().nullish(),
   addedById: zod.string().nullish(),
@@ -485,6 +486,7 @@ export const CreateBucketListItemBody = zod.object({
   title: zod.string().min(1),
   description: zod.string().nullish(),
   category: zod.string().nullish(),
+  deadline: zod.coerce.date().nullish(),
 });
 
 /**
@@ -498,6 +500,7 @@ export const UpdateBucketListItemBody = zod.object({
   title: zod.string().optional(),
   description: zod.string().nullish(),
   category: zod.string().nullish(),
+  deadline: zod.coerce.date().nullish(),
   completed: zod.boolean().optional(),
 });
 
@@ -508,7 +511,8 @@ export const UpdateBucketListItemResponse = zod.object({
   category: zod
     .string()
     .nullish()
-    .describe("e.g. place, restaurant, activity, experience"),
+    .describe("Free-form category label (predefined or custom)"),
+  deadline: zod.coerce.date().nullish().describe("Optional target date"),
   completed: zod.boolean(),
   completedAt: zod.coerce.date().nullish(),
   addedById: zod.string().nullish(),

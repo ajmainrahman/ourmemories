@@ -14,6 +14,7 @@ function serialize(row: typeof bucketListTable.$inferSelect) {
     title: row.title,
     description: row.description,
     category: row.category,
+    deadline: row.deadline,
     completed: row.completed,
     completedAt: row.completedAt ? row.completedAt.toISOString() : null,
     addedById: row.addedById,
@@ -39,6 +40,7 @@ router.post("/bucket-list", async (req, res) => {
       title: body.title,
       description: body.description ?? null,
       category: body.category ?? null,
+      deadline: body.deadline ?? null,
       addedById: req.user!.userId,
       addedByName: req.user!.name,
     })
@@ -54,6 +56,7 @@ router.patch("/bucket-list/:id", async (req, res) => {
   if (body.title !== undefined) updates.title = body.title;
   if (body.description !== undefined) updates.description = body.description;
   if (body.category !== undefined) updates.category = body.category;
+  if (body.deadline !== undefined) updates.deadline = body.deadline;
   if (body.completed !== undefined) {
     updates.completed = body.completed;
     updates.completedAt = body.completed ? new Date() : null;

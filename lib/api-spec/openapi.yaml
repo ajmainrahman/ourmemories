@@ -791,7 +791,8 @@ components:
         id: { type: string }
         title: { type: string }
         description: { type: string, nullable: true }
-        category: { type: string, nullable: true, description: "e.g. place, restaurant, activity, experience" }
+        category: { type: string, nullable: true, description: "Free-form category label (predefined or custom)" }
+        deadline: { type: string, format: date, nullable: true, description: "Optional target date" }
         completed: { type: boolean }
         completedAt: { type: string, format: date-time, nullable: true }
         addedById: { type: string, nullable: true }
@@ -806,6 +807,7 @@ components:
         title: { type: string, minLength: 1 }
         description: { type: string, nullable: true }
         category: { type: string, nullable: true }
+        deadline: { type: string, format: date, nullable: true }
       required: [title]
 
     UpdateBucketListInput:
@@ -814,6 +816,7 @@ components:
         title: { type: string }
         description: { type: string, nullable: true }
         category: { type: string, nullable: true }
+        deadline: { type: string, format: date, nullable: true }
         completed: { type: boolean }
 
     Milestone:

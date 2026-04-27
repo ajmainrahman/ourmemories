@@ -17,8 +17,8 @@ This is a pnpm workspace monorepo using TypeScript. Each package manages its own
 - `/` Home (today summary, stats, recent + on-this-day, mood breakdown)
 - `/journal` browse memories, `/journal/new`, `/journal/:id`, `/journal/:id/edit`
 - `/letters` sealed letters, `/letters/new`, `/letters/:id`
-- `/bucket-list` shared bucket list / wishlist
-- `/milestones` anniversaries with days-since and countdown counters
+- `/bucket-list` shared bucket list / wishlist (categories incl. custom, optional deadline with "X days remaining" badge, inline edit)
+- `/milestones` anniversaries with days-since and countdown counters (inline edit)
 - `/calendar` calendar view, `/insights` aggregate charts
 
 ## Auth

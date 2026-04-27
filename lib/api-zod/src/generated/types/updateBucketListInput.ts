@@ -10,5 +10,6 @@ export interface UpdateBucketListInput {
   title?: string;
   description?: string | null;
   category?: string | null;
+  deadline?: Date | null;
   completed?: boolean;
 }

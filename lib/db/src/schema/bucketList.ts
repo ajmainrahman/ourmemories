@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, boolean, date, timestamp, uuid } from "drizzle-orm/pg-core";
 import { usersTable } from "./users";
 
 export const bucketListTable = pgTable("bucket_list_items", {
@@ -6,6 +6,7 @@ export const bucketListTable = pgTable("bucket_list_items", {
   title: text("title").notNull(),
   description: text("description"),
   category: text("category"),
+  deadline: date("deadline"),
   completed: boolean("completed").notNull().default(false),
   completedAt: timestamp("completed_at", { withTimezone: true }),
   addedById: uuid("added_by_id").references(() => usersTable.id, {

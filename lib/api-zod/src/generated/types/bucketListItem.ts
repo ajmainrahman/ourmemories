@@ -10,8 +10,10 @@ export interface BucketListItem {
   id: string;
   title: string;
   description?: string | null;
-  /** e.g. place, restaurant, activity, experience */
+  /** Free-form category label (predefined or custom) */
   category?: string | null;
+  /** Optional target date */
+  deadline?: Date | null;
   completed: boolean;
   completedAt?: Date | null;
   addedById?: string | null;
