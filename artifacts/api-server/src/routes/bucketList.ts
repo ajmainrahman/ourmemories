@@ -51,7 +51,7 @@ router.post("/bucket-list", async (req, res) => {
 router.patch("/bucket-list/:id", async (req, res) => {
   const body = UpdateBucketListItemBody.parse(req.body);
   const updates: Partial<typeof bucketListTable.$inferInsert> = {
-    updatedAt: new Date(),
+    updatedAt: new Date().toISOString(),
   };
   if (body.title !== undefined) updates.title = body.title;
   if (body.description !== undefined) updates.description = body.description;

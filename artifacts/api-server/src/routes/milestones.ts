@@ -42,7 +42,7 @@ router.post("/milestones", async (req, res) => {
 router.patch("/milestones/:id", async (req, res) => {
   const body = UpdateMilestoneBody.parse(req.body);
   const updates: Partial<typeof milestonesTable.$inferInsert> = {
-    updatedAt: new Date(),
+    updatedAt: new Date().toISOString(),
   };
   if (body.title !== undefined) updates.title = body.title;
   if (body.date !== undefined) updates.date = body.date;
