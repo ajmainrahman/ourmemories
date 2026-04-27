@@ -23,8 +23,8 @@ export const MOOD_COLORS: Record<string, string> = {
 };
 
 export const AUTHOR_LABELS: Record<string, string> = {
-  self: "Mine",
-  partner: "Theirs",
+  self: "Ajmain",
+  partner: "Khusmita",
   both: "Ours",
 };
 
