@@ -1,5 +1,4 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   try {
     const { default: app } = await import("../artifacts/api-server/dist/vercel/vercel.mjs");
     return app(req, res);
