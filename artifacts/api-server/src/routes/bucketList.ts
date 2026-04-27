@@ -59,7 +59,7 @@ router.patch("/bucket-list/:id", async (req, res) => {
   if (body.deadline !== undefined) updates.deadline = body.deadline;
   if (body.completed !== undefined) {
     updates.completed = body.completed;
-    updates.completedAt = body.completed ? new Date() : null;
+    updates.completedAt = body.completed ? new Date().toISOString() : null;
   }
   const [row] = await db
     .update(bucketListTable)
